@@ -1,4 +1,5 @@
 import speech_recognition as sr
+import subprocess
 
 # 创建识别器对象
 recognizer = sr.Recognizer()
@@ -22,3 +23,9 @@ with sr.Microphone() as source:
         print("无法请求结果；{0}".format(e))
     except sr.WaitTimeoutError:
         print("等待超时，没有检测到语音输入")
+
+# # 打开记事本
+# subprocess.Popen(['notepad.exe'])
+
+# # 打开Microsoft Edge浏览器
+# subprocess.Popen([r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'])

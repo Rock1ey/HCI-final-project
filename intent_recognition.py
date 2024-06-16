@@ -21,6 +21,20 @@ intents = {
         [{"TEXT": "日程"}, {"TEXT": "今天"}],
         [{"TEXT": "日程"}, {"TEXT": "明天"}],
         [{"TEXT": "日程"}, {"TEXT": "周末"}],
+    ],
+    "浏览器": [ 
+        [{"TEXT": "打开"}, {"TEXT": "浏览器"}], 
+        [{"TEXT": "启动"}, {"TEXT": "浏览器"}], 
+        [{"TEXT": "上网"}], 
+        [{"TEXT": "打开"}, {"TEXT": "网页"}], 
+        [{"TEXT": "浏览"}], 
+    ],
+    "记事本": [ 
+        [{"TEXT": "打开"}, {"TEXT": "记事本"}], 
+        [{"TEXT": "启动"}, {"TEXT": "记事本"}], 
+        [{"TEXT": "记笔记"}], 
+        [{"TEXT": "写笔记"}], 
+        [{"TEXT": "记事"}],
     ]
 }
 
@@ -71,27 +85,30 @@ def get_random_schedule():
     ]
     return random.choice(schedules)
 
-def recommend_food(weather):
-    if "下雨" in weather:
-        return "下雨天可以考虑点外卖，吃一些温暖的食物，比如热汤、热面、炖菜等。"
-    elif "下雪" in weather:
-        return "下雪天可以考虑吃火锅、涮肉等火热的食物，也可以吃一些热气腾腾的麻辣烫。"
-    elif "晴天" in weather:
-        return "晴天可以考虑野餐，可以准备一些沙拉、水果、三明治等清爽的食物，也可以烧烤。"
-    elif "多云" in weather:
-        return "多云天气适合吃一些清淡的食物，比如清炒、凉拌等，也可以选择去餐馆品尝不同的菜肴。"
-    elif "阴天" in weather:
-        return "阴天可以考虑吃一些滋补的食物，比如排骨汤、炖鸡汤等，也可以做一些温暖的家常菜。"
-    elif "雾霾" in weather:
-        return "雾霾天气不宜外出，可以在家里做一些清淡易消化的食物，避免油腻和辛辣的食物。"
-    elif "台风" in weather:
-        return "台风天气应该注意安全，不宜外出，可以准备一些方便食品和干粮，确保食物的新鲜和安全。"
-    elif "雷阵雨" in weather:
-        return "雷阵雨天气变化较快，可以准备一些方便快捷的食物，比如快餐、速食等，以备不时之需。"
-    elif "冰雹" in weather:
-        return "冰雹天气不宜外出，可以在家里做一些暖心的美食，比如热乎乎的汤羹、炖品等，保持身体暖和。"
-    else:
-        return "当前天气情况下，暂时无法提供推荐。"
+
+weather_conditions_and_tips = {
+    "晴天": "天气很好，适合户外活动，但记得防晒。",
+    "多云": "天气较好，适合外出，但可能会有短暂的阴云。",
+    "阴天": "天气阴沉，注意保暖。",
+    "下雨": "请携带雨具，注意防滑。",
+    "暴雨": "尽量减少外出，注意安全。",
+    "下雪": "穿暖和点，注意路滑。",
+    "大雪": "尽量减少外出，注意保暖和路滑。",
+    "雾霾": "减少外出，必要时戴口罩。",
+    "台风": "尽量避免外出，注意安全。",
+    "雷阵雨": "携带雨具，注意雷电天气。",
+    "冰雹": "避免外出，注意安全。"
+}
+
+def get_random_weather_and_tips():
+    weather = random.choice(list(weather_conditions_and_tips.keys()))
+    tips = weather_conditions_and_tips[weather]
+    return weather, tips
+
+def weather_query():
+    weather, tips = get_random_weather_and_tips()
+    return f"天气情况：{weather}。注意事项：{tips}"
+
 
 # 根据意图执行相应的操作
 def perform_action(intent):
@@ -103,17 +120,17 @@ def perform_action(intent):
     else:
         return "抱歉，我不明白您的意图。"
 
-# 测试函数
-texts = [
-    "明天天气怎么样？",
-    "今天有什么安排？",
-    "晴天应该吃什么？",
-    "下雨天有什么安排？"
-]
+# # 测试函数
+# texts = [
+#     "明天天气怎么样？",
+#     "今天有什么安排？",
+#     "晴天应该吃什么？",
+#     "下雨天有什么安排？"
+# ]
 
-for text in texts:
-    intent, entities = extract_intent_and_entities(text)
-    print(f"Text: {text}")
-    print(f"Intent: {intent}, Entities: {entities}")
-    print(perform_action(intent))
-    print()
+# for text in texts:
+#     intent, entities = extract_intent_and_entities(text)
+#     print(f"Text: {text}")
+#     print(f"Intent: {intent}, Entities: {entities}")
+#     print(perform_action(intent))
+#     print()

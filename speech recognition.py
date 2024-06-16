@@ -1,67 +1,112 @@
 import tkinter as tk
+from tkinter import scrolledtext
+import subprocess
+import webbrowser 
 
-# import threading
-# import speech_recognition as sr
+from intent_recognition import extract_intent_and_entities
+from intent_recognition import get_random_weather_and_tips
+from intent_recognition import get_random_schedule
 
-# # 创建识别器对象
-# recognizer = sr.Recognizer()
-# is_listening = False
+import threading
+import speech_recognition as sr
 
-def start_voice_recognition():
-    # 在这里添加开始语音识别逻辑
-    # global is_listening # 全局变量，多个函数共享
-    # is_listening = True # 设置为开始录音
-    # threading.Thread(target=listen_in_background).start() # 开启线程
-    pass
+# 创建识别器对象
+recognizer = sr.Recognizer()
 
-def stop_voice_recognition():
-    # 在这里添加停止语音识别的逻辑
-    # global is_listening
-    # is_listening = False # 设置为停止录音
-    # print("Listening stopped:", is_listening)
-    pass
+class ChatApplication:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("语音助手")
 
-# def listen_in_background():
-#     # 线程：语音输入过程
-#     global is_listening
-#     with sr.Microphone() as source:
-#         if is_listening:
-#             print("请说话...")
-#             recognizer.adjust_for_ambient_noise(source)
-#             try:
-#                 audio_data = recognizer.listen(source, timeout=10, phrase_time_limit=5)
-#                 text = recognizer.recognize_sphinx(audio_data, language='zh-CN')
-#                 is_listening = True
-#                 print("你说的是: " + text)
-#             except sr.UnknownValueError:
-#                 print("无法识别音频")
-#             except sr.RequestError as e:
-#                 print("无法请求结果；{0}".format(e))
-#             except sr.WaitTimeoutError:
-#                 print("等待超时，没有检测到语音输入")
+        # Configure background color for chat history
+        self.background_color = "#f0f0f0"  # Light gray background color
 
-#创建主窗口
-root = tk.Tk()
-root.title("语音识别应用")
-root.configure(background='lightblue')  # 设置背景颜色
+        self.chat_history = scrolledtext.ScrolledText(root, width=60, height=20, bg=self.background_color)
+        self.chat_history.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
 
-#创建提示标签
-tip_label = tk.Label(root, text="点击按钮开始语音识别", bg='lightblue',font=("华文行楷",20,"normal"))
-tip_label.pack(pady=10)
-tip_label = tk.Label(root, text="1.天气预报", bg='lightblue',font=("华文行楷",15,"normal"))
-tip_label.pack(pady=10)
-tip_label = tk.Label(root, text="2.日程安排", bg='lightblue',font=("华文行楷",15,"normal"))
-tip_label.pack(pady=10)
-tip_label = tk.Label(root, text="3.播放音乐", bg='lightblue',font=("华文行楷",15,"normal"))
-tip_label.pack(pady=10)
+        # 用户和机器人头像（假设在未来的逻辑中仍然使用）
+        # self.user_avatar = tk.PhotoImage(file="user.png")  # 替换为您的用户头像图像
+        self.robot_avatar = tk.PhotoImage(file="robot.png")  # 替换为您的机器人头像图像
 
-#创建开始语音识别按钮
-start_button = tk.Button(root, text="开始录音", command=start_voice_recognition, bg='lightgreen', width=15)
-start_button.pack(pady=5)
+        # 将 'robot' 改为 ''（空字符串）以删除机器人头像上方的标签
+        self.robot_name = ''
 
-#创建停止语音识别按钮
-stop_button = tk.Button(root, text="停止录音", command=stop_voice_recognition, bg='salmon', width=15)
-stop_button.pack(pady=5)
+        # 创建录音按钮
+        self.record_button = tk.Button(root, text="录音", command=self.record_voice)
+        self.record_button.grid(row=2, column=1, pady=20, padx=20, sticky='s')  # 根据需要调整行、列、内边距和粘性属性
 
-#运行主循环
-root.mainloop()
+        # 模拟聊天会话（可以根据实际使用情况删除或修改）
+        self.add_message(self.robot_name, "请问您需要什么帮助？")
+
+    def handle_recognized_text(self, text):
+        intent, entities = extract_intent_and_entities(text)
+        print(f"Intent: {intent}, Entities: {entities}")
+        result = self.perform_action(intent)
+        self.add_message(self.robot_name, result)
+
+    def listen_in_background(self):
+        with sr.Microphone() as source:
+            print("请说话...")
+            recognizer.adjust_for_ambient_noise(source, duration=0.5)
+            try:
+                audio_data = recognizer.listen(source, timeout=3, phrase_time_limit=3)
+                text = recognizer.recognize_sphinx(audio_data, language='zh-CN')
+                print("你说的是: " + text)
+                self.handle_recognized_text(text)
+            except sr.UnknownValueError:
+                print("无法识别音频")
+            except sr.RequestError as e:
+                print("无法请求结果；{0}".format(e))
+            except sr.WaitTimeoutError:
+                print("等待超时，没有检测到语音输入")
+
+    def record_voice(self):
+        # 录音功能的占位函数；替换为实际逻辑
+        #在这里添加开始语音识别逻辑
+        threading.Thread(target=self.listen_in_background).start()
+
+    def add_message(self, sender, message):
+        self.chat_history.configure(state='normal')
+
+        if sender == "You":
+            self.chat_history.image_create(tk.END, image=self.user_avatar)
+            self.chat_history.insert(tk.END, " ")
+            self.chat_history.insert(tk.END, f"You: {message}\n", 'user')
+        elif sender == self.robot_name:
+            self.chat_history.image_create(tk.END, image=self.robot_avatar)
+            self.chat_history.insert(tk.END, "Robot: ")
+            self.chat_history.insert(tk.END, f"{message}\n", 'robot_message')
+
+        self.chat_history.configure(state='disabled')
+        self.chat_history.see(tk.END)
+
+    def run(self):
+        self.root.mainloop()
+
+
+    def perform_action(self, intent):
+        if intent == "天气":
+            weather, tips = get_random_weather_and_tips()
+            result = f"天气情况：{weather}\n{tips}"
+        elif intent == "日程":
+            result = "您有一个日程安排：" + get_random_schedule()
+        elif intent == "浏览器": 
+            webbrowser.open("http://www.google.com") 
+            # 可以根据需求更改默认打开的网址 
+            result = "浏览器已打开。" 
+        elif intent == "记事本": 
+            subprocess.Popen(['notepad.exe']) 
+            result = "记事本已打开。"
+        else:
+            result = "抱歉，我不明白您的意图。"
+        return result
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ChatApplication(root)
+
+    app.chat_history.tag_config('user', foreground='#007bff')  # 绿色文本
+    app.chat_history.tag_config('robot_message', foreground='#28a745')  
+
+    app.run()
