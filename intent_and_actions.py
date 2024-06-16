@@ -2,6 +2,9 @@ import spacy
 from spacy.matcher import Matcher
 import random
 
+import subprocess
+import webbrowser 
+
 # 加载预训练的spaCy中文模型
 nlp = spacy.load('zh_core_web_sm')
 
@@ -35,6 +38,13 @@ intents = {
         [{"TEXT": "记笔记"}], 
         [{"TEXT": "写笔记"}], 
         [{"TEXT": "记事"}],
+    ],
+    "音乐": [
+        [{"TEXT": "播放"}, {"TEXT": "音乐"}],
+        [{"TEXT": "打开"}, {"TEXT": "音乐"}],
+        [{"TEXT": "听"}, {"TEXT": "音乐"}],
+        [{"TEXT": "播放"}],
+        [{"TEXT": "音乐"}],
     ]
 }
 
@@ -44,10 +54,11 @@ matcher = Matcher(nlp.vocab)
 for intent, patterns in intents.items():
     matcher.add(intent, patterns)
 
+# 从文本中提取意图和实体
 def extract_intent_and_entities(text):
     doc = nlp(text)
     matches = matcher(doc)
-    print(f"Matches: {matches}")  # 调试信息，打印匹配结果
+    # print(f"Matches: {matches}")  # 调试信息，打印匹配结果
     if matches:
         intent = nlp.vocab.strings[matches[0][0]]
         entities = {ent.label_: ent.text for ent in doc.ents}
@@ -109,28 +120,24 @@ def weather_query():
     weather, tips = get_random_weather_and_tips()
     return f"天气情况：{weather}。注意事项：{tips}"
 
-
-# 根据意图执行相应的操作
+# 根据意图执行相应的动作
 def perform_action(intent):
     if intent == "天气":
-        weather = get_random_weather()
-        return f"天气情况：{weather}\n{recommend_food(weather)}"
+        weather, tips = get_random_weather_and_tips()
+        result = f"天气情况：{weather} {tips}"
     elif intent == "日程":
-        return "您有一个日程安排：" + get_random_schedule()
+        result = "您有一个日程安排：" + get_random_schedule()
+    elif intent == "浏览器": 
+        webbrowser.open("http://www.google.com") 
+        # 可以根据需求更改默认打开的网址 
+        result = "浏览器已打开。" 
+    elif intent == "记事本": 
+        subprocess.Popen(['notepad.exe']) 
+        result = "记事本已打开。"
+    elif intent == "听音乐":
+        # 打开音乐流媒体网站
+        webbrowser.open("https://music.163.com/")  # 可以根据需求更改默认打开的音乐网站
+        result = "音乐网站已打开。"
     else:
-        return "抱歉，我不明白您的意图。"
-
-# # 测试函数
-# texts = [
-#     "明天天气怎么样？",
-#     "今天有什么安排？",
-#     "晴天应该吃什么？",
-#     "下雨天有什么安排？"
-# ]
-
-# for text in texts:
-#     intent, entities = extract_intent_and_entities(text)
-#     print(f"Text: {text}")
-#     print(f"Intent: {intent}, Entities: {entities}")
-#     print(perform_action(intent))
-#     print()
+        result = "抱歉，我不明白您的意图。"
+    return result
