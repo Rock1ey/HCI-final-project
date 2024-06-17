@@ -38,6 +38,7 @@ intents = {
         [{"TEXT": "记笔记"}], 
         [{"TEXT": "写笔记"}], 
         [{"TEXT": "记事"}],
+        [{"TEXT": "笔记"}], 
     ],
     "音乐": [
         [{"TEXT": "播放"}, {"TEXT": "音乐"}],
@@ -54,8 +55,10 @@ matcher = Matcher(nlp.vocab)
 for intent, patterns in intents.items():
     matcher.add(intent, patterns)
 
-# 从文本中提取意图和实体
 def extract_intent_and_entities(text):
+    '''
+    从文本中提取意图和实体
+    '''
     doc = nlp(text)
     matches = matcher(doc)
     # print(f"Matches: {matches}")  # 调试信息，打印匹配结果
@@ -120,8 +123,11 @@ def weather_query():
     weather, tips = get_random_weather_and_tips()
     return f"天气情况：{weather}。注意事项：{tips}"
 
-# 根据意图执行相应的动作
+
 def perform_action(intent):
+    '''
+    根据意图执行相应的动作
+    '''
     if intent == "天气":
         weather, tips = get_random_weather_and_tips()
         result = f"天气情况：{weather} {tips}"
@@ -134,7 +140,7 @@ def perform_action(intent):
     elif intent == "记事本": 
         subprocess.Popen(['notepad.exe']) 
         result = "记事本已打开。"
-    elif intent == "听音乐":
+    elif intent == "音乐":
         # 打开音乐流媒体网站
         webbrowser.open("https://music.163.com/")  # 可以根据需求更改默认打开的音乐网站
         result = "音乐网站已打开。"

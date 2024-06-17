@@ -17,7 +17,12 @@ api_key = "c7e014dd116610bdebd2427259dd1005"
 # 讯飞代理类，用于一次语音识别的实现
 class XunfeiASRClient:
     def __init__(self, app_id, api_key, result_callback):
-
+        """
+        初始化讯飞ASR客户端
+        :param app_id: 应用ID
+        :param api_key: 应用API密钥
+        :param result_callback: 识别结果回调函数
+        """
         # 设置app_id和api_key
         self.app_id = app_id
         self.api_key = api_key
@@ -31,11 +36,15 @@ class XunfeiASRClient:
         self.audio = pyaudio.PyAudio()
         self.stream = None
         if self.ws:
+            # 启动一个线程接收WebSocket消息
             self.trecv = threading.Thread(target=self.recv)
             self.trecv.start()
 
     def create_connection(self):
-        # 建立连接方法的实现
+        """
+        建立WebSocket连接的方法
+        :return: WebSocket对象
+        """
         base_url = "ws://rtasr.xfyun.cn/v1/ws"
         ts = str(int(time.time()))
         signa = self.generate_signa(ts)
@@ -46,8 +55,11 @@ class XunfeiASRClient:
             return None
 
     def generate_signa(self, ts):
-        # 生成签名方法
-
+        """
+        生成签名的方法
+        :param ts: 时间戳
+        :return: 签名字符串
+        """
         # 拼接 app_id 和 ts
         data = (self.app_id + ts).encode('utf-8')
         
@@ -66,7 +78,9 @@ class XunfeiASRClient:
         return signa
 
     def send_audio_stream(self):
-        # 录音并输入音频流
+        """
+        录音并发送音频流的方法
+        """
         if self.ws is None:
             print("WebSocket connection failed.")
             return
@@ -96,6 +110,9 @@ class XunfeiASRClient:
             print("send end tag success")
 
     def recv(self):
+        """
+        接收WebSocket消息的方法
+        """
         try:
             full_result = ""
             while self.ws and self.ws.connected:
@@ -125,14 +142,16 @@ class XunfeiASRClient:
                     self.ws.close()
                     return
             print("Recognized text: " + full_result)
-            self.result_callback(full_result) # 回调函数结果
+            self.result_callback(full_result) # 调用结果回调函数
         except websocket.WebSocketConnectionClosedException:
             print("receive result end")
         except Exception as e:
             print(f"Error receiving data: {e}")
 
     def close(self):
-        # 关闭连接方法
+        """
+        关闭连接的方法
+        """
         self.is_recording = False
         if self.ws:
             self.ws.close()

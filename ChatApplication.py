@@ -46,7 +46,9 @@ class ChatApplication:
         self.recording = False  # 记录当前是否正在录音
 
     def handle_recognized_text(self, text):
-        # 处理识别到的文本，识别意图并执行相应的操作
+        '''
+        处理识别到的文本，识别意图并执行相应的操作
+        '''
         intent, entities = extract_intent_and_entities(text)
         print(f"Intent: {intent}, Entities: {entities}")
         result = perform_action(intent)
@@ -54,7 +56,9 @@ class ChatApplication:
         self.add_message(self.robot_name, result)
 
     def toggle_recording(self):
-        # 按钮状态转化
+        '''
+        按钮状态转化
+        '''
         if not self.recording:
             # 开始录音
             self.record_voice()
@@ -67,19 +71,25 @@ class ChatApplication:
         self.recording = not self.recording
 
     def record_voice(self):
-        # 开始录音，创建一个新的连接
+        '''
+        开始录音，创建一个新的连接
+        '''
         if self.xunfei_client is None or not self.xunfei_client.ws.connected:
             self.xunfei_client = XunfeiASRClient(app_id=app_id, api_key=api_key, \
                                                  result_callback=self.handle_recognized_text)
         threading.Thread(target=self.xunfei_client.send_audio_stream).start()
 
     def stop_recording(self):
-        # 结束录音，关闭连接
+        '''
+        结束录音，关闭连接
+        '''
         if self.xunfei_client:
             self.xunfei_client.close()
 
     def add_message(self, sender, message):
-        # 往文本框中添加一条信息，用于显示回应
+        '''
+        往文本框中添加一条信息，用于显示回应
+        '''
         self.chat_history.configure(state='normal')
 
         if sender == "You":
