@@ -32,14 +32,6 @@ class ChatApplication:
         # 将 'robot' 改为 ''（空字符串）以删除机器人头像上方的标签
         self.robot_name = ''
 
-        # # 创建录音按钮
-        # self.record_button = tk.Button(root, text="录音", command=self.record_voice)
-        # self.record_button.grid(row=2, column=1, pady=20, padx=20, sticky='s')  # 根据需要调整行、列、内边距和粘性属性
-
-        # # 创建结束录音按钮
-        # self.stop_button = tk.Button(root, text="结束录音", command=self.stop_recording)
-        # self.stop_button.grid(row=2, column=2, pady=20, padx=20, sticky='s')
-
         # 创建开始录音按钮，并将图像设置为按钮背景
         self.record_button_image = tk.PhotoImage(file="image/record.png")
         self.stop_button_image = tk.PhotoImage(file="image/stop.png")

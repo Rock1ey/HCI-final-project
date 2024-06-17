@@ -9,8 +9,6 @@ import websocket
 from urllib.parse import quote
 import logging
 import pyaudio
-import numpy as np
-from scipy.signal import lfilter
 
 # 应用的app_id和api_key
 app_id = "14ff183b"  
